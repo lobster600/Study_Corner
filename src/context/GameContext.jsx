@@ -8,7 +8,7 @@ export function GameProvider({ children }) {
   const [level, setLevel] = useState(1);
   const [ownedItems, setOwnedItems] = useState([]);
 
-  // 🎯 MAIN XP SYSTEM
+  // 🎯 XP SYSTEM
   const addXP = (amount) => {
     setXp((prevXP) => {
       const newXP = prevXP + amount;
@@ -17,7 +17,7 @@ export function GameProvider({ children }) {
         const requiredXP = currentLevel * 100;
 
         if (newXP >= requiredXP) {
-          setCoins((c) => c + 25); // level up reward
+          setCoins((c) => c + 25);
           return currentLevel + 1;
         }
 
@@ -27,22 +27,34 @@ export function GameProvider({ children }) {
       return newXP;
     });
 
-    // 🪙 passive reward
     setCoins((prevCoins) => prevCoins + Math.floor(amount * 0.5));
   };
 
-  // ⏱ session reward
   const addSessionReward = () => {
     addXP(10);
   };
 
-  // 🛒 shop system
+  // 🛒 FIXED SHOP SYSTEM (SAFE + NO DOUBLE CHARGE)
   const buyItem = (item) => {
-    setCoins((prevCoins) => {
-      if (prevCoins < item.price) return prevCoins;
+    setOwnedItems((prevOwned) => {
+      // already owned → do nothing
+      if (prevOwned.some((i) => i.id === item.id)) {
+        return prevOwned;
+      }
 
-      setOwnedItems((prev) => [...prev, item]);
-      return prevCoins - item.price;
+      // not enough coins → do nothing
+      if (coins < item.price) {
+        return prevOwned;
+      }
+
+      // deduct coins safely
+      setCoins((prevCoins) => prevCoins - item.price);
+
+      // add item once
+      return [
+        ...prevOwned,
+        item,
+      ];
     });
   };
 
@@ -53,7 +65,6 @@ export function GameProvider({ children }) {
         coins,
         level,
         ownedItems,
-
         addXP,
         addSessionReward,
         buyItem,

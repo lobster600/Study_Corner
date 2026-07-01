@@ -1,8 +1,14 @@
 import Dashboard from "./pages/Dashboard";
-import "./App.css";
+import "./index.css";
 
-function App() {
-  return <Dashboard />;
+export default function App() {
+  return (
+    <>
+      <header className="header">
+        Study Corner
+      </header>
+
+      <Dashboard />
+    </>
+  );
 }
-
-export default App;

@@ -1,5 +1,11 @@
 export default function CircularTimer({ value, maxValue, time, isBreak }) {
-  const percentage = Math.max(0, Math.min(100, (value / maxValue) * 100));
+  const safeMax = Number.isFinite(maxValue) && maxValue > 0 ? maxValue : 1;
+  const safeValue = Number.isFinite(value) ? value : 0;
+
+  const percentage = Math.min(
+    100,
+    Math.max(0, (safeValue / safeMax) * 100)
+  );
 
   const color = isBreak ? "#34d399" : "#6366f1";
 
@@ -15,7 +21,7 @@ export default function CircularTimer({ value, maxValue, time, isBreak }) {
         position: "relative",
         background: "#0b1220",
         boxShadow: `
-          0 0 30px ${color}33,
+          0 0 35px ${color}55,
           inset 0 0 25px rgba(0,0,0,.7)
         `,
       }}
@@ -30,7 +36,8 @@ export default function CircularTimer({ value, maxValue, time, isBreak }) {
             ${color} ${percentage}%,
             #1e293b ${percentage}% 100%
           )`,
-          transition: "background 0.8s linear",
+          transition: "background 0.3s linear",
+          filter: "drop-shadow(0 0 8px ${color})",
         }}
       />
 
@@ -40,8 +47,7 @@ export default function CircularTimer({ value, maxValue, time, isBreak }) {
           position: "absolute",
           inset: "8px",
           borderRadius: "50%",
-          border: "2px solid rgba(255,255,255,0.08)",
-          zIndex: 1,
+          border: `2px solid ${color}33`,
         }}
       />
 
@@ -54,9 +60,9 @@ export default function CircularTimer({ value, maxValue, time, isBreak }) {
           background:
             "radial-gradient(circle at top, #182338 0%, #0f172a 100%)",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          flexDirection: "column",
           zIndex: 2,
           border: "1px solid rgba(255,255,255,.08)",
           boxShadow: "inset 0 0 20px rgba(0,0,0,.8)",

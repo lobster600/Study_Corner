@@ -4,8 +4,8 @@ import Sidebar from "../components/Sidebar";
 import PomodoroTimer from "../components/PomodoroTimer";
 import TimerPresets from "../components/TimerPresets";
 import StatsCards from "../components/StatsCards";
-import Shop from "../components/Shop";
 import Room from "../components/Room";
+import Shop from "../components/Shop";
 
 import usePomodoro from "../hooks/usePomodoro";
 import { useGame } from "../context/GameContext";
@@ -21,6 +21,7 @@ const PRESETS = {
 
 export default function Dashboard() {
   const [selectedPreset, setSelectedPreset] = useState("classic");
+  const [activeTab, setActiveTab] = useState("none");
 
   const preset = PRESETS[selectedPreset];
 
@@ -47,54 +48,57 @@ export default function Dashboard() {
   return (
     <div className="app">
 
-      <Sidebar />
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* LEFT PANEL */}
       <div className="leftPanel">
         <TimerPresets
           selected={selectedPreset}
           onSelect={setSelectedPreset}
         />
-
-        <StatsCards />
       </div>
 
-      {/* MAIN PANEL */}
-      <main className="mainPanel">
+      <div className="rightPanel">
+        <div className="rightContent">
 
-        {/* TOP: TIMER */}
-        <div className="topRow">
-
-          <div className="timerPanel">
-            <div className="timerCard">
-              <PomodoroTimer
-                timeLeft={timeLeft}
-                isRunning={isRunning}
-                isBreak={isBreak}
-                completedSessions={completedSessions}
-                startTimer={startTimer}
-                pauseTimer={pauseTimer}
-                resetTimer={resetTimer}
-              />
-            </div>
+          <div className="timerCard">
+            <PomodoroTimer
+              timeLeft={timeLeft}
+              isRunning={isRunning}
+              isBreak={isBreak}
+              completedSessions={completedSessions}
+              startTimer={startTimer}
+              pauseTimer={pauseTimer}
+              resetTimer={resetTimer}
+              workTime={preset.work * 60}
+              breakTime={preset.break * 60}
+            />
           </div>
-
-        </div>
-
-        {/* BOTTOM: GAME WORLD */}
-        <div className="bottomRow">
 
           <div className="roomSection">
             <Room isRunning={isRunning} isBreak={isBreak} />
           </div>
 
-          <div className="shopSection">
+        </div>
+      </div>
+
+      {/* OVERLAYS (FIXED: CLICK OUTSIDE TO CLOSE) */}
+
+      {activeTab === "shop" && (
+        <div className="overlayPage" onClick={() => setActiveTab("none")}>
+          <div onClick={(e) => e.stopPropagation()}>
             <Shop />
           </div>
-
         </div>
+      )}
 
-      </main>
+      {activeTab === "stats" && (
+        <div className="overlayPage" onClick={() => setActiveTab("none")}>
+          <div onClick={(e) => e.stopPropagation()}>
+            <StatsCards />
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

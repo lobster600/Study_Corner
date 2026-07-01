@@ -14,21 +14,20 @@ export default function usePomodoro(
   const [isBreak, setIsBreak] = useState(false);
   const [completedSessions, setCompletedSessions] = useState(0);
 
-  const isBreakRef = useRef(isBreak);
   const sessionRef = useRef(0);
+  const isBreakRef = useRef(false);
 
-  // Keep refs up to date
+  // sync break state
   useEffect(() => {
     isBreakRef.current = isBreak;
   }, [isBreak]);
 
-  // If the preset changes while the timer isn't running,
-  // reset the displayed time to the new work length.
+  // 🔥 CRITICAL FIX: reset timer when preset changes
   useEffect(() => {
-    if (!isRunning && !isBreak) {
-      setTimeLeft(WORK_TIME);
-    }
-  }, [WORK_TIME, isRunning, isBreak]);
+    setTimeLeft(WORK_TIME);
+    setIsBreak(false);
+    setIsRunning(false);
+  }, [WORK_TIME, BREAK_TIME, LONG_BREAK]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -37,13 +36,13 @@ export default function usePomodoro(
       setTimeLeft((prev) => {
         if (prev > 1) return prev - 1;
 
-        // Break finished
+        // BREAK FINISHED
         if (isBreakRef.current) {
           setIsBreak(false);
           return WORK_TIME;
         }
 
-        // Work finished
+        // WORK FINISHED
         const newSession = sessionRef.current + 1;
         sessionRef.current = newSession;
 
@@ -61,7 +60,6 @@ export default function usePomodoro(
   }, [isRunning, WORK_TIME, BREAK_TIME, LONG_BREAK]);
 
   const startTimer = () => setIsRunning(true);
-
   const pauseTimer = () => setIsRunning(false);
 
   const resetTimer = () => {

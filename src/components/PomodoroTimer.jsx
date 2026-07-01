@@ -3,9 +3,6 @@ import TimerControls from "./TimerControls";
 import SessionInfo from "./SessionInfo";
 import { formatTime } from "../utils/formatTime";
 
-const WORK_TIME = 25 * 60;
-const BREAK_TIME = 5 * 60;
-
 export default function PomodoroTimer({
   timeLeft,
   isRunning,
@@ -14,11 +11,14 @@ export default function PomodoroTimer({
   startTimer,
   pauseTimer,
   resetTimer,
+  workTime,
+  breakTime,
 }) {
-  const maxValue = isBreak ? BREAK_TIME : WORK_TIME;
+  const maxValue = isBreak ? breakTime : workTime;
 
   return (
     <section className="card">
+
       <SessionInfo
         completedSessions={completedSessions}
         isBreak={isBreak}
@@ -37,6 +37,7 @@ export default function PomodoroTimer({
         onPause={pauseTimer}
         onReset={resetTimer}
       />
+
     </section>
   );
 }
